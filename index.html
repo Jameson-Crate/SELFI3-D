@@ -1,0 +1,164 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=default"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      h1 {
+        text-align: center;
+      }
+
+      .container {
+        margin: 0 auto;
+        padding: 60px 20%;
+      }
+
+      figure {
+        text-align: center;
+      }
+
+      img {
+        display: inline-block;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>SELFI3-D: Facial Mesh Reconstruction and Tattoo Visualization from Sparse Input Views</h1>
+      <div style="text-align: center"><B>Team Members</B>: Akshaan Ahuja, Michelle Chen, Jameson Crate, Valerie Li</div>
+
+      <br />
+
+      <h2>Summary and Team Members</h2>
+      <p>
+        We plan to use gaussian splatting, poisson reconstruction and texture mapping to create realistic renderings of 
+        face tattoos. Upon creating the mesh of the face, we will overlay a texture map to render a realistic facial appearance.
+        Adding onto the base texture, we will overlay a second texture map that contains the tattoo design. 
+      </p>
+      <p>
+        Team Members:
+        <ul>
+          <li>Jameson Crate</li>
+          <li>Michelle Chen</li>
+          <li>Valerie Li</li>
+          <li>Akshaan Ahuja</li>
+        </ul>
+      </p>
+
+      <h2>Problem Description</h2>
+      <p>
+        Lets be honest, everyone these days wants a face tattoo, but most of them come out looking horrible. We present SELFI3-D, a pipeline
+        for facial mesh reconstruction and tattoo texture mapping that will help convince worried parents that a face tattoo is the right decision before unreversable steps are taken. Our problem addresses the problem of reconstructing faces from a sets of images with realistic texture and structure. Additionally we take arbitrary 2D images as texture maps in order to visualize the image mapped onto an individual's face. We will use gaussian splatting, poisson reconstruction and mesh regularization methods to reconstruct a mesh of a face. We will then use texture mapping to map the 
+        indivudal's facial features onto the mesh as well as the selected tattoo. The challenge lies in achieving a precise mesh reconstruction that will render a realistic huminoid picture!
+
+      </p>
+
+      <h2>Goals and Deliverables</h2>
+      
+      <h3>What We Plan to Deliver (Baseline)</h3>
+      <p>
+        Use sparse views of an individual's face to create a 3D facial reconstruction with textured mapped tattoos using gaussian splatting and poisson reconstruction.
+      </p>
+      <ul>
+        <li>Use 3D Reconstruction to create a rendering of a person's face.</li>
+        <li>Using the output mesh, implement a loop subdivision scheme to upscale the mesh as well as texture map the mesh to look like the input person.</li>
+        <li>Apply a texture mapping of desired face tattoo to visualize it on the person's face.</li>
+      </ul>
+      
+      <h3>What We Hope to Deliver (Aspirational)</h3>
+      <p>
+        If we are ahead of schedule and things are going well, we wish to involve animation. By creating an internal 
+        skeleton corresponding to the facial features (rigging), we can then animate the face and have it speak or 
+        show expressions. Additionally, we can add custom scene lighting to make our rendered photos look nice or view
+        tattoos under different lighting conditions such as in the clurb. We also want to expiriment with dynamic tattoos.
+      </p>
+      <ul>
+        <li>Create a rig for the mesh to animate the Face</li>
+        <li>Expression transfer between different faces</li>
+        <li>Dynamic Tattoos (using gifs as tattoo texture maps)</li>
+      </ul>
+      
+      <h3>How We Will Measure Success</h3>
+      <p>
+        We will measure reconstruction accuracy via the Chamfer Distance or Hausdorff Distance, which will 
+        compare the reconstructed mesh with a ground-truth facial image.
+        
+        Graph: Bar or line chart comparing reconstruction error across different methods (e.g., raw vs. loop-subdivided mesh)
+        
+        We will also measure the SSIM (Structural Similarity Index) or PSNR (Peak Signal-to-Noise Ratio)
+        which will evaluate how well the texture-mapped face resembles the original image.
+        We will show side-by-side images of the original image and the textured mesh.
+        
+        Graph: SSIM/PSNR scores for various stages of texture mapping (base mesh vs. subdivided vs. final output).
+      </p>
+      
+    
+      <p>
+        Questions we plan to answer:
+      </p>
+      <ul>
+        <li>How well can we apply a custom texture mapping to a generated mesh of a face?</li>
+        <li>How well can texture mapping mimic the nuances of a human's face?</li>
+        <li>What would I look like with a sick face tattoo?</li>
+      </ul>
+      </ul>
+
+      <h2>Schedule</h2>
+      <p>
+        Tasks and subtasks our team will execute over the next ~4 weeks:
+      </p>
+      
+      <h3>Week 1 (April 5 - April 11)</h3>
+      <ul>
+        <li>Survey of Existing Methods</li>
+        <li>Test Reconstruction Methods</li>
+      </ul>
+      
+      <h3>Week 2 (April 12 - April 18)</h3>
+      <ul>
+        <li>Finalize Reconstruction</li>
+        <li>Intial Facial Texture Mapping</li>
+      </ul>
+      
+      <h3>Week 3 (April 19 - April 25)</h3>
+      <ul>
+        <li>Implement Texture Mapping for input face image.</li>
+        <li>Test Texture Mapping quality on several different images</li>
+        <li>Test layering two different texture mappings on top of one another (Planning Code Design so they are two separate processes)</li>
+      </ul>
+      
+      <h3>Week 4 (April 26 - May 2)</h3>
+      <ul>
+        <li>Begin deliverables</li>
+        <li>Test our pipeline on different subjects</li>
+        <li>Attack Stretch goals</li>
+        <li>Prepare final presentation</li>
+      </ul>
+
+      <h2>Resources</h2>
+      <h3>References</h3>
+      <p>
+        List of resources (books, papers, online resources) that are references for your project:
+      </p>
+      <ul>
+        <li>Gaussian splat rendering: https://anttwo.github.io/sugar/</li>
+        <li>https://en.wikipedia.org/wiki/Texture_mapping</li>
+        <li>https://za.pinterest.com/mybestfriendharry/face-tattoos/</li>
+      </ul>
+      
+      <h3>Computing Platform & Resources</h3>
+      <p>
+        Computing platform, hardware and software resources that will be used for the project:
+      </p>
+      <ul>
+        <li>Compute: https://app.hyperbolic.xyz/</li>
+      </ul>
+    </div>
+  </body>
+</html>

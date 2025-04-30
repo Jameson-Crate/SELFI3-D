@@ -1,0 +1,302 @@
+#!/usr/bin/env python3
+
+import numpy as np
+import argparse
+from pathlib import Path
+import open3d as o3d
+
+def load_pointcloud(file_path):
+    """
+    Load a pointcloud from a file based on its extension.
+    Supports .txt, .xyz, .csv, and .ply files.
+    """
+    file_path = Path(file_path)
+    ext = file_path.suffix.lower()
+    
+    if ext in ['.txt', '.xyz', '.csv']:
+        data = np.loadtxt(file_path, delimiter=' ')
+        points = data[:, :3]  # Extract xyz coordinates
+        extra_data = data[:, 3:] if data.shape[1] > 3 else None
+        
+    elif ext == '.ply':
+        try:
+            pcd = o3d.io.read_point_cloud(str(file_path))
+            points = np.asarray(pcd.points)
+            extra_data = np.asarray(pcd.colors) if pcd.has_colors() else None
+        except Exception as e:
+            print(f"Error loading PLY file: {e}")
+            exit(1)
+    
+    elif ext == '.nvm':
+        try:
+            points, colors = parse_nvm_file(file_path)
+            extra_data = colors
+        except Exception as e:
+            print(f"Error loading NVM file: {e}")
+            exit(1)
+    
+    else:
+        raise ValueError(f"Unsupported file extension: {ext}. Supported extensions are .txt, .xyz, .csv, .ply, and .nvm")
+    
+    return points, extra_data
+
+def parse_nvm_file(nvm_file_path):
+    """
+    Parse a .nvm file and extract the point cloud data.
+    
+    Args:
+        nvm_file_path (str): Path to the .nvm file
+        
+    Returns:
+        np.ndarray: Array of 3D points
+        np.ndarray: Array of RGB colors for each point
+    """
+    with open(nvm_file_path, 'r') as f:
+        lines = f.readlines()
+    
+    # Check if the file is in NVM format
+    if not lines[0].strip().startswith('NVM_V3'):
+        raise ValueError("The file does not appear to be in NVM_V3 format")
+    
+    # Find where the camera section ends and point data begins
+    line_idx = 2  # Skip header and empty line
+    
+    # Handle empty lines or non-integer values
+    while line_idx < len(lines) and not lines[line_idx].strip():
+        line_idx += 1
+    
+    if line_idx >= len(lines):
+        raise ValueError("File format error: unexpected end of file")
+    
+    try:
+        num_cameras = int(lines[line_idx].strip())
+    except ValueError:
+        raise ValueError(f"Invalid number of cameras: '{lines[line_idx].strip()}'")
+    
+    line_idx += num_cameras + 1  # Skip camera data
+    
+    # Ensure we haven't gone past the end of the file
+    if line_idx >= len(lines):
+        raise ValueError("File format error: no point data found")
+    
+    # Get number of points, handling empty lines
+    while line_idx < len(lines) and not lines[line_idx].strip():
+        line_idx += 1
+    
+    if line_idx >= len(lines):
+        raise ValueError("File format error: no point count found")
+    
+    try:
+        num_points = int(lines[line_idx].strip())
+    except ValueError:
+        raise ValueError(f"Invalid number of points: '{lines[line_idx].strip()}'")
+    
+    line_idx += 1
+    
+    points = []
+    colors = []
+    
+    # Parse each point
+    for i in range(num_points):
+        if line_idx + i >= len(lines):
+            break
+            
+        line = lines[line_idx + i].strip()
+        if not line:
+            continue
+            
+        parts = line.split()
+        if len(parts) < 7:  # At minimum we need x, y, z, r, g, b
+            continue
+            
+        try:
+            # Extract position
+            x, y, z = float(parts[0]), float(parts[1]), float(parts[2])
+            
+            # Extract color
+            r, g, b = int(parts[3]), int(parts[4]), int(parts[5])
+            
+            points.append([x, y, z])
+            colors.append([r/255.0, g/255.0, b/255.0])  # Normalize to [0,1]
+        except (ValueError, IndexError) as e:
+            print(f"Warning: Skipping invalid point data: {line}")
+            continue
+    
+    return np.array(points), np.array(colors)
+
+def save_pointcloud(file_path, points, extra_data=None):
+    """
+    Save a pointcloud to a file based on its extension.
+    Supports .txt, .xyz, .csv, and .ply files.
+    """
+    file_path = Path(file_path)
+    ext = file_path.suffix.lower()
+    
+    if ext in ['.txt', '.xyz', '.csv']:
+        if extra_data is not None:
+            data = np.hstack((points, extra_data))
+        else:
+            data = points
+        
+        np.savetxt(file_path, data, delimiter=' ')
+    
+    elif ext == '.ply':
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(points)
+        
+        # Add colors if available
+        if extra_data is not None and extra_data.shape[1] >= 3:
+            # Make sure colors are in range [0, 1]
+            colors = extra_data[:, :3]
+            if np.max(colors) > 1.0:
+                colors = colors / 255.0
+            
+            pcd.colors = o3d.utility.Vector3dVector(colors)
+        
+        # Save the point cloud
+        o3d.io.write_point_cloud(str(file_path), pcd)
+    
+    else:
+        raise ValueError(f"Unsupported output file extension: {ext}. Supported extensions are .txt, .xyz, .csv, and .ply")
+
+def remove_outliers_statistical(points, extra_data=None, nb_neighbors=20, std_ratio=2.0):
+    """
+    Remove outliers using statistical outlier removal method.
+    
+    Args:
+        points (np.ndarray): Array of 3D points
+        extra_data (np.ndarray): Additional data like colors
+        nb_neighbors (int): Number of neighbors to consider
+        std_ratio (float): Standard deviation ratio threshold
+        
+    Returns:
+        np.ndarray: Filtered points
+        np.ndarray: Filtered extra data
+    """
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(points)
+    
+    # Apply statistical outlier removal
+    cl, ind = pcd.remove_statistical_outlier(nb_neighbors=nb_neighbors, std_ratio=std_ratio)
+    
+    # Extract inlier points
+    inlier_points = np.asarray(cl.points)
+    
+    # Extract corresponding extra data if available
+    inlier_extra_data = None
+    if extra_data is not None:
+        inlier_extra_data = extra_data[ind]
+    
+    return inlier_points, inlier_extra_data
+
+def remove_outliers_radius(points, extra_data=None, radius=0.5, min_neighbors=2):
+    """
+    Remove outliers using radius outlier removal method.
+    
+    Args:
+        points (np.ndarray): Array of 3D points
+        extra_data (np.ndarray): Additional data like colors
+        radius (float): Radius of the sphere to search for neighbors
+        min_neighbors (int): Minimum number of neighbors required to be an inlier
+        
+    Returns:
+        np.ndarray: Filtered points
+        np.ndarray: Filtered extra data
+    """
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(points)
+    
+    # Apply radius outlier removal
+    cl, ind = pcd.remove_radius_outlier(nb_points=min_neighbors, radius=radius)
+    
+    # Extract inlier points
+    inlier_points = np.asarray(cl.points)
+    
+    # Extract corresponding extra data if available
+    inlier_extra_data = None
+    if extra_data is not None:
+        inlier_extra_data = extra_data[ind]
+    
+    return inlier_points, inlier_extra_data
+
+def visualize_point_cloud(points, colors=None):
+    """
+    Visualize the point cloud using Open3D.
+    
+    Args:
+        points (np.ndarray): Array of 3D points
+        colors (np.ndarray): Array of RGB colors for each point
+    """
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(points)
+    
+    if colors is not None:
+        # Make sure colors are in range [0, 1]
+        if np.max(colors) > 1.0:
+            colors = colors / 255.0
+        pcd.colors = o3d.utility.Vector3dVector(colors)
+    
+    # Create coordinate frame for reference
+    coordinate_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0)
+    
+    # Visualize
+    o3d.visualization.draw_geometries([pcd, coordinate_frame])
+
+def main():
+    parser = argparse.ArgumentParser(description='Remove outliers from a point cloud')
+    parser.add_argument('input_file', help='Path to input point cloud file (.txt, .xyz, .csv, .ply, or .nvm)')
+    parser.add_argument('--output_file', help='Path to output point cloud file. If not specified, will use input_file_filtered[.ext]')
+    parser.add_argument('--method', choices=['statistical', 'radius'], default='statistical', help='Outlier removal method')
+    parser.add_argument('--nb_neighbors', type=int, default=20, help='Number of neighbors for statistical method')
+    parser.add_argument('--std_ratio', type=float, default=2.0, help='Standard deviation ratio for statistical method')
+    parser.add_argument('--radius', type=float, default=0.5, help='Radius for radius method')
+    parser.add_argument('--min_neighbors', type=int, default=2, help='Minimum neighbors for radius method')
+    parser.add_argument('--visualize', action='store_true', help='Visualize before and after filtering')
+    
+    args = parser.parse_args()
+    
+    input_path = Path(args.input_file)
+    if not input_path.exists():
+        print(f"Error: Input file {input_path} does not exist")
+        return
+    
+    if args.output_file:
+        output_path = Path(args.output_file)
+    else:
+        output_path = input_path.with_name(f"{input_path.stem}_filtered{input_path.suffix}")
+    
+    print(f"Loading point cloud from {input_path}")
+    points, extra_data = load_pointcloud(input_path)
+    
+    print(f"Original point cloud has {len(points)} points")
+    
+    if args.visualize:
+        print("Visualizing original point cloud...")
+        visualize_point_cloud(points, extra_data)
+    
+    # Apply outlier removal
+    if args.method == 'statistical':
+        print(f"Removing outliers using statistical method (nb_neighbors={args.nb_neighbors}, std_ratio={args.std_ratio})...")
+        filtered_points, filtered_extra_data = remove_outliers_statistical(
+            points, extra_data, nb_neighbors=args.nb_neighbors, std_ratio=args.std_ratio
+        )
+    else:  # radius method
+        print(f"Removing outliers using radius method (radius={args.radius}, min_neighbors={args.min_neighbors})...")
+        filtered_points, filtered_extra_data = remove_outliers_radius(
+            points, extra_data, radius=args.radius, min_neighbors=args.min_neighbors
+        )
+    
+    print(f"Filtered point cloud has {len(filtered_points)} points")
+    print(f"Removed {len(points) - len(filtered_points)} outliers ({(len(points) - len(filtered_points)) / len(points) * 100:.2f}%)")
+    
+    if args.visualize:
+        print("Visualizing filtered point cloud...")
+        visualize_point_cloud(filtered_points, filtered_extra_data)
+    
+    print(f"Saving filtered point cloud to {output_path}")
+    save_pointcloud(output_path, filtered_points, filtered_extra_data)
+    
+    print("Done")
+
+if __name__ == "__main__":
+    main()

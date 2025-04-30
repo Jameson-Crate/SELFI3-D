@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Project specific
+*.obj
+*.mtl
+*.ply
+*.fbx
+*.glb
+*.blend
+*.blend1
+*.jpg
+*.png
+*.gif
+*.mp4
+*.mov
+*.avi
+*.log
+*.out
+*.err
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Large data files
+data/
+output/
+results/
+models/
+checkpoints/
+
+# Temporary files
+tmp/
+temp/
+
+# Colmap
+colmap/

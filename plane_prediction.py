@@ -98,32 +98,57 @@ def remove_plane(points, colors=None, distance_threshold=0.01, ransac_n=3,
 
 def visualize_point_cloud(filtered_points, filtered_colors, original_points=None, original_colors=None):
     """Visualize the original and filtered point clouds."""
+    # First, try to remove any existing windows
+    o3d.visualization.ViewControl.destroy_all_windows()
+    
+    # Create visualizer and set properties
+    vis = o3d.visualization.Visualizer()
+    vis.create_window(window_name="Point Cloud", width=1280, height=720, visible=True)
+    
+    # Reset everything
+    vis.clear_geometries()
+    vis.get_render_option().load_from_json("")  # Reset render options
+    vis.get_view_control().load_from_json("")   # Reset view control
+    
+    # Force reset the view point and camera
+    vc = vis.get_view_control()
+    vc.set_zoom(0.7)
+    vc.set_front([0, 0, -1])
+    vc.set_lookat([0, 0, 0])
+    vc.set_up([0, -1, 0])
+    
+    # Set clean background and options
+    opt = vis.get_render_option()
+    opt.background_color = np.asarray([0, 0, 0])  # Black background
+    opt.point_size = 2.0
+    opt.show_coordinate_frame = False
+    opt.light_on = False  # Turn off lighting
+    
     if original_points is not None:
-        # Create original point cloud
         original_pcd = o3d.geometry.PointCloud()
         original_pcd.points = o3d.utility.Vector3dVector(original_points)
         if original_colors is not None:
             original_pcd.colors = o3d.utility.Vector3dVector(original_colors)
         else:
-            # Set to red if no colors
             original_pcd.paint_uniform_color([1, 0, 0])
+        vis.add_geometry(original_pcd)
     
-    # Create filtered point cloud
     filtered_pcd = o3d.geometry.PointCloud()
     filtered_pcd.points = o3d.utility.Vector3dVector(filtered_points)
     if filtered_colors is not None:
         filtered_pcd.colors = o3d.utility.Vector3dVector(filtered_colors)
     else:
-        # Set to green if no colors
         filtered_pcd.paint_uniform_color([0, 1, 0])
+    vis.add_geometry(filtered_pcd)
     
-    # Visualize
-    if original_points is not None:
-        o3d.visualization.draw_geometries([original_pcd, filtered_pcd],
-                                         window_name="Original (red) vs Filtered (green)")
-    else:
-        o3d.visualization.draw_geometries([filtered_pcd],
-                                         window_name="Filtered Point Cloud")
+    # Update geometry and render
+    vis.update_geometry(filtered_pcd)
+    vis.poll_events()
+    vis.update_renderer()
+    
+    # Run the visualizer
+    vis.run()
+    vis.destroy_window()
 
 def main():
     parser = argparse.ArgumentParser(description='Remove plane from point cloud')

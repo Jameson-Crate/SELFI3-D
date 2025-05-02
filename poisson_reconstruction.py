@@ -140,12 +140,114 @@ def transfer_colors(mesh, pcd, k=3):
     return mesh
 
 
+def remove_outliers(pcd, nb_neighbors=20, std_ratio=2.0):
+    """
+    Remove outliers from point cloud using statistical outlier removal.
+    
+    Parameters
+    ----------
+    pcd : open3d.geometry.PointCloud
+        The input point cloud.
+    nb_neighbors : int, default=20
+        Number of neighbors to consider.
+    std_ratio : float, default=2.0
+        Standard deviation ratio threshold.
+    
+    Returns
+    -------
+    pcd_clean : open3d.geometry.PointCloud
+        The cleaned point cloud.
+    """
+    print(f"Removing outliers (nb_neighbors={nb_neighbors}, std_ratio={std_ratio})...")
+    cl, ind = pcd.remove_statistical_outlier(nb_neighbors=nb_neighbors, std_ratio=std_ratio)
+    return cl
+
+
+def estimate_normals(points, k=30, orient_with_viewpoint=True, viewpoint=None):
+    """
+    Estimate normals for a point cloud.
+    
+    Parameters
+    ----------
+    points : numpy.ndarray
+        Nx3 array of point coordinates.
+    k : int, default=30
+        Number of nearest neighbors to use for normal estimation.
+    orient_with_viewpoint : bool, default=True
+        Whether to orient normals toward a viewpoint.
+    viewpoint : numpy.ndarray, optional
+        3D viewpoint coordinates. If None, (0,0,0) is used.
+    
+    Returns
+    -------
+    normals : numpy.ndarray
+        Nx3 array of estimated normals.
+    """
+    print(f"Estimating normals (k={k})...")
+    
+    # Create point cloud object
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(points)
+    
+    # Estimate normals - FIX: use knn instead of k
+    pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamKNN(knn=k))
+    
+    # Orient normals
+    if orient_with_viewpoint:
+        if viewpoint is None:
+            viewpoint = [0, 0, 0]  # Default viewpoint at origin
+        pcd.orient_normals_towards_camera_location(viewpoint)
+    
+    # Try to make normals consistent
+    try:
+        pcd.orient_normals_consistent_tangent_plane(k=k)
+    except Exception as e:
+        print(f"Warning: Could not orient normals consistently: {e}")
+    
+    return np.asarray(pcd.normals)
+
+
+def save_point_cloud_with_normals(file_path, points, normals, colors=None):
+    """
+    Save a point cloud with normals to a file.
+    
+    Parameters
+    ----------
+    file_path : str
+        Path to save the point cloud to.
+    points : numpy.ndarray
+        Nx3 array of point coordinates.
+    normals : numpy.ndarray
+        Nx3 array of point normals.
+    colors : numpy.ndarray, optional
+        Nx3 array of point colors.
+    
+    Returns
+    -------
+    bool
+        True if successful.
+    """
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(points)
+    pcd.normals = o3d.utility.Vector3dVector(normals)
+    if colors is not None:
+        pcd.colors = o3d.utility.Vector3dVector(colors)
+    
+    return o3d.io.write_point_cloud(file_path, pcd)
+
+
 if __name__ == "__main__":
     import argparse
     
-    parser = argparse.ArgumentParser(description="Poisson Surface Reconstruction")
+    parser = argparse.ArgumentParser(description="Point Cloud Processing with Normal Estimation")
     parser.add_argument("input", help="Input point cloud file")
-    parser.add_argument("output", help="Output mesh file")
+    parser.add_argument("output", help="Output point cloud file with normals")
+    parser.add_argument("--estimate_normals", action="store_true", help="Estimate normals for the point cloud")
+    parser.add_argument("--normal_k", type=int, default=30, help="Number of neighbors for normal estimation")
+    parser.add_argument("--clean_points", action="store_true", help="Remove outliers from point cloud before processing")
+    parser.add_argument("--outlier_std", type=float, default=2.0, help="Standard deviation multiplier for outlier removal")
+    parser.add_argument("--outlier_nb", type=int, default=20, help="Number of neighbors to consider for outlier removal")
+    parser.add_argument("--poisson", action="store_true", help="Perform Poisson reconstruction")
     parser.add_argument("--depth", type=int, default=8, help="Maximum depth of the octree")
     parser.add_argument("--scale", type=float, default=1.1, help="Scale factor")
     parser.add_argument("--linear", action="store_true", help="Use linear fit")
@@ -157,7 +259,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # Load point cloud
-    points, normals = load_point_cloud(args.input)
+    points, colors = load_point_cloud(args.input)
     
     if points is not None:
         print(f"Loaded {len(points)} points")
@@ -165,47 +267,65 @@ if __name__ == "__main__":
         # Create point cloud object for later use
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(points)
-        if normals is not None:
-            pcd.normals = o3d.utility.Vector3dVector(normals)
+        if colors is not None:
+            pcd.colors = o3d.utility.Vector3dVector(colors)
         
-        # Perform reconstruction
-        mesh = poisson_surface_reconstruction(
-            points, normals, 
-            depth=args.depth, 
-            scale=args.scale, 
-            linear_fit=args.linear, 
-            n_threads=args.threads
-        )
+        # Clean point cloud if requested
+        if args.clean_points:
+            pcd = remove_outliers(pcd, nb_neighbors=args.outlier_nb, std_ratio=args.outlier_std)
+            points = np.asarray(pcd.points)
+            colors = np.asarray(pcd.colors) if pcd.has_colors() else None
+            print(f"After outlier removal: {len(points)} points")
         
-        # Remove low-density vertices if threshold is provided
-        if args.density_threshold > 0 and hasattr(mesh, 'vertex_density'):
-            densities = np.asarray(mesh.vertex_density)
-            vertices_to_remove = densities < args.density_threshold
-            mesh.remove_vertices_by_mask(vertices_to_remove)
+        # Estimate normals if requested
+        normals = None
+        if args.estimate_normals:
+            normals = estimate_normals(points, k=args.normal_k)
+            print(f"Estimated normals for {len(normals)} points")
         
-        # Transfer colors if requested
-        if args.color:
-            # Check if point cloud has colors
-            try:
-                colors = np.asarray(pcd.colors)
-                if len(colors) == 0:
-                    # Try to extract colors from points if they exist
-                    if points.shape[1] >= 6:  # x,y,z,r,g,b format
-                        color_data = points[:, 3:6]
-                        # Normalize if needed
-                        if color_data.max() > 1:
-                            color_data = color_data / 255.0
-                        pcd.colors = o3d.utility.Vector3dVector(color_data)
-                
-                mesh = transfer_colors(mesh, pcd, k=args.color_k)
-                print("Transferred colors from point cloud to mesh")
-            except Exception as e:
-                print(f"Failed to transfer colors: {e}")
-        
-        # Save the result
-        if save_mesh(mesh, args.output):
-            print(f"Mesh saved to {args.output}")
+        # Save point cloud with normals
+        output_path = args.output
+        if args.poisson:
+            # If we're doing Poisson reconstruction, save the point cloud with normals to a temporary file
+            normals_path = args.output.replace('.ply', '_with_normals.ply')
+            save_point_cloud_with_normals(normals_path, points, normals, colors)
+            print(f"Saved point cloud with normals to {normals_path}")
+            
+            # Perform reconstruction
+            mesh = poisson_surface_reconstruction(
+                points, normals, 
+                depth=args.depth, 
+                scale=args.scale, 
+                linear_fit=args.linear, 
+                n_threads=args.threads
+            )
+            
+            # Remove low-density vertices if threshold is provided
+            if args.density_threshold > 0 and hasattr(mesh, 'vertex_density'):
+                densities = np.asarray(mesh.vertex_density)
+                vertices_to_remove = densities < args.density_threshold
+                mesh.remove_vertices_by_mask(vertices_to_remove)
+            
+            # Transfer colors if requested
+            if args.color:
+                # Check if point cloud has colors
+                try:
+                    if pcd.has_colors():
+                        mesh = transfer_colors(mesh, pcd, k=args.color_k)
+                        print("Transferred colors from point cloud to mesh")
+                except Exception as e:
+                    print(f"Failed to transfer colors: {e}")
+            
+            # Save the result
+            if save_mesh(mesh, output_path):
+                print(f"Mesh saved to {output_path}")
+            else:
+                print(f"Failed to save mesh to {output_path}")
         else:
-            print(f"Failed to save mesh to {args.output}")
+            # Just save the point cloud with normals
+            if save_point_cloud_with_normals(output_path, points, normals, colors):
+                print(f"Point cloud with normals saved to {output_path}")
+            else:
+                print(f"Failed to save point cloud to {output_path}")
     else:
         print("Failed to load point cloud")

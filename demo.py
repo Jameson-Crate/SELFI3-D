@@ -40,7 +40,7 @@ def generate_mesh(image_files):
         gr.State so later steps can access it.
     """
     # TODO: integrate your MAST3R + post‑processing here
-    mesh_path = "dummy_face_mesh.obj"
+    mesh_path = "ak_mast3r_no_plane.obj"
     with open(mesh_path, "w", encoding="utf‑8") as f:
         f.write(f"# dummy OBJ generated {datetime.utcnow().isoformat()}\n")
     return mesh_path, mesh_path  # (mesh for <Model3D/>, mesh for State)

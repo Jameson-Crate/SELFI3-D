@@ -1,0 +1,164 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=default"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      h1 {
+        text-align: center;
+      }
+
+      .container {
+        margin: 0 auto;
+        padding: 60px 20%;
+      }
+
+      figure {
+        text-align: center;
+      }
+
+      img {
+        display: inline-block;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>SELFI3-D Milestone</h1>
+      <div style="text-align: center">
+        <b>Team Members</b>: Akshaan Ahuja, Jameson Crate, Michelle Chen,
+        Valerie Li
+      </div>
+
+      <br />
+      <div style="text-align: center; margin: 20px 0">
+        <p><b>Project Links:</b></p>
+        <p>
+          Video Presentation:
+          <a
+            href="https://drive.google.com/file/d/1Eno7R0phGs-EzA_l5CGQLaA5SdsYrIKr/view?usp=sharing"
+          >
+            https://drive.google.com/file/d/1Eno7R0phGs-EzA_l5CGQLaA5SdsYrIKr/view?usp=sharing</a
+          >
+        </p>
+        <p>
+          Slides:
+          <a
+            href="https://docs.google.com/presentation/d/1a-stRxFNvy2kxD5SsM-ItsuNpEQqmf0-zQjJ58QCRrE/edit?usp=sharing"
+            >https://docs.google.com/presentation/d/1a-stRxFNvy2kxD5SsM-ItsuNpEQqmf0-zQjJ58QCRrE/edit?usp=sharing</a
+          >
+        </p>
+        <p>
+          GitHub Repository:
+          <a href="https://github.com/Jameson-Crate/SELFI3-D/"
+            >https://github.com/Jameson-Crate/SELFI3-D/</a
+          >
+        </p>
+        <p>
+          Project Webpage:
+          <a href="https://jameson-crate.github.io/SELFI3-D/milestone.html"
+            >https://jameson-crate.github.io/SELFI3-D/milestone.html</a
+          >
+        </p>
+      </div>
+
+      <br />
+
+      <h2>Different Reconstruction Methods</h2>
+
+      <h2>Preliminary Results</h2>
+      Our preliminary results explored four different 3D reconstruction
+      techniques: COLMAP, NKSR, FaceScape and DUSt3R.
+
+      <h3>COLMAP</h3>
+      <p>
+        COLMAP is a traditional reconstruction method that relies on solving a
+        joint-optimization problem in order to solve for the structure of a
+        scene as well the extrinisc parameters of a set of cameras. We attempted
+        to use COLMAP to take multiple input views and reconstruct a point cloud
+        which we could then use to generate a mesh. However, the point cloud
+        ended up being too sparse in this case resulting in poor mesh
+        reconstruction in the next step.
+      </p>
+
+      <h3>NKSR</h3>
+      <p>
+        NKSR is a 3-D mesh construction technique that recovers a 3-D surface
+        from an input point cloud. NKSR is known for its ability to generalize,
+        handle noise effectively, and minimize training requirements which is
+        why it can still produce high quality outputs from a sparse,
+        high-quality or noise point cloud.
+      </p>
+
+      <h3>Texture Mapping</h3>
+      <p>
+        We attempted to use texture mapping in order to color the vertices the
+        mesh we generated from NKSR. We constructed a KD-tree to efficiently
+        look up mesh vertices' neighbors in the point cloud and colored the
+        corresponding vertex with the distance weighted color of its three
+        nearest neighbors.
+      </p>
+
+      <h3>FaceScape</h3>
+      <p>
+        There were several intial difficulties with Python dependencies.
+        Additionally, the model generated a mask that was looked generic and did
+        not align closely with the subject's facial features.
+        
+      </p>
+      <td style="text-align: center">
+        <img src="facescape.jpeg" width="400px" />
+        <figcaption>
+          The mask is overlayed on the right image. The mask was generated
+          from first fitting the FaceScape model with 2-D facial landmarks
+          from the input picture. Then, the resulting mesh was normalized and
+          positioned in a straight on view. Finally, the depth map is
+          overlayed onto the original image.
+        </figcaption>
+      </td>
+
+      <h3>DUSt3R</h3>
+      <p>
+        DUSt3R (Dense and Unconstrained Stereo 3-D Reconstruction) is a
+        cutting-edge method for 3-D scene reconsturction. Unlike traditional
+        approaches that require known camera cameras and poses, DUSt3R
+        reconstructs dense 3-D geometry directly from uncalibratd image pairs.
+        Its key novelties include direct regression of dense 3D point maps from
+        image pair and its transformer based architecture. Additionally, it also
+        produces depth and confidence mapping for each of the input images.
+        These innovations make DUSt3R state-of-the-art by enabling fast,
+        end-to-end and versatile 3-D reconstruction from arbitrary image
+        collections.
+
+        
+      </p>
+      <td style="text-align: center">
+        <img src="dust3r.png" width="400px" />
+      </td>
+
+      <p>
+        As a result of its accurate results, we decided to move forward with
+        using DUSt3R.
+      </p>
+
+      <h2>Progress Relative to our Plan and Timeline</h2>
+      <p>
+        We are currently on track with our agreed-upon timeline. We have
+        currently surveyed the current State-Of-The-Art reconstruction models,
+        as well as tested them and selected which one best suits our purposes.
+        The current step we are on is working on the initial texture mapping
+        steps and planning our code design for implementing two rounds of custom
+        texture mapping. We will then move on to test our pipeline on several
+        different subjects as well as attack some of our stretch goals, such as
+        rigging the mesh for realistic face movements or creating a fluid
+        texture map to give the illusion of a moving tattoo.
+      </p>
+    </div>
+  </body>
+</html>

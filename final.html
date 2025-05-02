@@ -105,7 +105,37 @@
 
       <h2>References</h2>
       <p>
-        1. DUSt3R 2. MAST3R 3. CloudCompare 4. COLMAP 5. FaceScape 6. Open3D
+        1. DUSt3R 2. MAST3R 3. CloudCompare 4. COLMAP 5. FaceScape 6. Open3D 7.
+        Perlin Noise
+      </p>
+
+      <h2>Team Contributions</h2>
+      <p>Valerie Li:</p>
+      <ol>
+        <li>Worked on creating a 3D mask overlay through FaceScape's
+          bilinear model. This involved updating or refactoring outdated
+          dependencies, fixing API breaks, and tuning model hyper-parameters to
+          fit our dataset. </li>
+        <li>Designed and implemented procedural bump mapping by
+          displacing each mesh vertex along its normal using a 3D Perlin noise
+          field. Initially, tried a 2D random noise approach, which produced
+          streaks, instead of true, isotropic skin-like micro-detail, which the 3D
+          Perlin noise field did!</li>
+        <li>Developed and debugged per-vertex
+          texture-mapping routines: created both orthographic and pinhole UV
+          projection methods, handled coordinate transforms
+          (reflect/rotate/translate), in an attempt to pick up skin-tone and hair
+          coloration from a frontal photograph. However, this did not succeed, and
+          the mesh did not change colors.</li>
+          <li>
+            Built an RGB overlay tattoo:
+            composited an input of a transparent facial tattoo into a texture atlas,
+            generated the corresponding .obj file with embedded UVs, and attempted
+            to bake the overlay onto the mesh. Unfortunately, this also did not work
+            on the mesh. Ultimately, unable to succeed in rendering the mesh in a
+            different color.
+          </li>
+      </ol>
       </p>
 
       <td style="text-align: center">

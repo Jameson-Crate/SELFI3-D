@@ -71,59 +71,53 @@
       <br />
       <h2>Abstract</h2>
       <p>
-        SELFI3-D is a project focused on creating high-quality 3D face reconstructions from various views of a person, as well as applying custom texture mapping to the resulting geometry.  
-        Our goal is to develop a pipeline that can generate accurate 3D face models and enable creative applications on these models, such as virtual face tattoos. Our pipeline is broken down into a few key steps. Firstly, from a set of input views, we constructed a sparse point cloud using DUSt3R as well as a mesh constructed from the point cloud, providing us with a starting point for our 3D reconstruction.
-        Next, we used MAST3R to produce a dense point cloud from the same set of input views, creating a dense 3D point cloud. 
-        We then used CloudCompare to remove outliers from the mesh and refine the geometry.
-        On our meshes, we applied bump mapping to the surface of the geometry to give the appearance of natural skin texture.
-        Finally, we applied a custom texture mapping to the resulting geometry, allowing us to tattoos to the face.
-
+        SELFI3-D is a project focused on creating high-quality 3D face
+        reconstructions from various views of a person, as well as applying
+        custom texture mapping to the resulting geometry. Our goal is to develop
+        a pipeline that can generate accurate 3D face models and enable creative
+        applications on these models, such as virtual face tattoos. Our pipeline
+        is broken down into a few key steps. Firstly, from a set of input views,
+        we constructed a sparse point cloud using DUSt3R as well as a mesh
+        constructed from the point cloud, providing us with a starting point for
+        our 3D reconstruction. Next, we used MAST3R to produce a dense point
+        cloud from the same set of input views, creating a dense 3D point cloud.
+        We then used CloudCompare to remove outliers from the mesh and refine
+        the geometry. On our meshes, we applied bump mapping to the surface of
+        the geometry to give the appearance of natural skin texture. Finally, we
+        applied a custom texture mapping to the resulting geometry, allowing us
+        to add tattoos to the face.
       </p>
-
-
 
       <h2>Technical Approach</h2>
       <p>
-        Our pipeline is broken down into a few key steps. Firstly, from a set of input views, we constructed a sparse point cloud using DUSt3R, providing us with a starting point for our 3D reconstruction.
-        Next, we used MAST3R to produce a dense point cloud from the same set of input views, creating a dense 3D mesh.
-        We then used CloudCompare to remove outliers from the mesh and refine the geometry.
-        Finally, we applied a custom texture mapping to the resulting geometry, allowing us to apply custom textures, such as tattoos, to the face.
-      </p>
-      
-      <h2>Results</h2>
-      <p>
-       blah blah blah 
+        Our pipeline is broken down into a few key steps. Firstly, from a set of
+        input views, we constructed a sparse point cloud using DUSt3R, providing
+        us with a starting point for our 3D reconstruction. Next, we used MAST3R
+        to produce a dense point cloud from the same set of input views,
+        creating a dense 3D mesh. We then used CloudCompare to remove outliers
+        from the mesh and refine the geometry. Finally, we applied a custom
+        texture mapping to the resulting geometry, allowing us to apply custom
+        textures, such as tattoos, to the face.
       </p>
 
+      <h2>Results</h2>
+      <p>blah blah blah</p>
 
       <h2>References</h2>
       <p>
-        1. DUSt3R
-        2. MAST3R
-        3. CloudCompare
-        4. COLMAP
-        5. FaceScape
-        6. Open3D
+        1. DUSt3R 2. MAST3R 3. CloudCompare 4. COLMAP 5. FaceScape 6. Open3D
       </p>
-
-     
-      
-
-     
-        
 
       <td style="text-align: center">
         <img src="facescape.jpeg" width="400px" />
         <figcaption>
-          The mask is overlayed on the right image. The mask was generated
-          from first fitting the FaceScape model with 2-D facial landmarks
-          from the input picture. Then, the resulting mesh was normalized and
-          positioned in a straight on view. Finally, the depth map is
-          overlayed onto the original image.
+          The mask is overlayed on the right image. The mask was generated from
+          first fitting the FaceScape model with 2-D facial landmarks from the
+          input picture. Then, the resulting mesh was normalized and positioned
+          in a straight on view. Finally, the depth map is overlayed onto the
+          original image.
         </figcaption>
       </td>
-
-      
     </div>
   </body>
 </html>

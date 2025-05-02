@@ -95,9 +95,24 @@
         us with a starting point for our 3D reconstruction. Next, we used MAST3R
         to produce a dense point cloud from the same set of input views,
         creating a dense 3D mesh. We then used CloudCompare to remove outliers
-        from the mesh and refine the geometry. Finally, we applied a custom
+        from the mesh and refine the geometry. We then proceeded to apply bump mapping to the surface of the mesh, which gave the appearance of natural skin texture. 
+        Finally, we applied a custom
         texture mapping to the resulting geometry, allowing us to apply custom
         textures, such as tattoos, to the face.
+
+        <h3>DUSt3R, MAST3R</h3>
+        <p>
+          DUSt3R and MAST3R are both open-source tools for creating varying densities of 3D point clouds from a set of input views of varying angles. 
+          We used DUSt3R to create a sparse point cloud from the input views, as well as a mesh from the point cloud, which we then used as a starting point for our 3D reconstruction. 
+          We then used MAST3R to produce a dense point cloud from the same set of input views.
+        </p>
+
+        <h3>CloudCompare</h3>
+        <p>
+          CloudCompare is an open-source tool for creating and editing 3D point clouds. 
+          We used CloudCompare to remove outliers from the mesh and refine the geometry.
+        </p>
+
       </p>
 
       <h2>Results</h2>
@@ -105,8 +120,8 @@
 
       <h2>References</h2>
       <p>
-        1. DUSt3R 2. MAST3R 3. CloudCompare 4. COLMAP 5. FaceScape 6. Open3D 7.
-        Perlin Noise
+        1. DUSt3R 2. MAST3R 3. CloudCompare: https://github.com/cloudcompare/cloudcompare 4. COLMAP 5. FaceScape 6. Open3D 7.
+        Perlin Noise 8. Poisson Reconstruction: https://github.com/mkazhdan/PoissonRecon
       </p>
 
       <h2>Team Contributions</h2>
@@ -137,6 +152,21 @@
           </li>
       </ol>
       </p>
+
+      <p>Akshaan Ahuja:</p>
+      <ol>
+        <li>
+         Worked on running DUST3R to create a sparse point cloud from the input views. 
+         This involved debugging the output based on the produced confidence maps. 
+         Experimented with varying the amount of input views as well as the difference in camera positions between views.</li>
+        <li>
+        Implemented Poisson Reconstruction to convert our dense point cloud from MAST3R into a complete mesh. 
+        Initially attempted a novel Python implementation based on the logic from the state-of-the-art Poisson Reconstruction repository: https://github.com/mkazhdan/PoissonRecon, working through the mathematical foundations of the algorithm. 
+        Later utilized CloudCompare software for a more robust solution, where I imported the point cloud, debugged and filtered noisy or outlying points, then applied Poisson Reconstruction. 
+        This process required significant experimentation with reconstruction depth, by varying the Octree depth to achieve the best results. 
+        After reconstruction, I trimmed the model based on the confidence values of the reconstruction to remove low-quality mesh regions, resulting in a high-fidelity 3D facial mesh that was ready for the next step of the pipeline which was bump mapping.
+        </li>
+      </ol>
 
       <td style="text-align: center">
         <img src="facescape.jpeg" width="400px" />

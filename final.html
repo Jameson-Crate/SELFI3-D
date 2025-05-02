@@ -95,7 +95,7 @@
         us with a starting point for our 3D reconstruction. Next, we used MAST3R
         to produce a dense point cloud from the same set of input views,
         creating a dense 3D mesh. We then used CloudCompare to remove outliers
-        from the mesh and refine the geometry. We then proceeded to apply bump mapping to the surface of the mesh, which gave the appearance of natural skin texture. 
+        from the mesh and refine the geometry. We then proceeded to apply texture mapping and bump mapping to the surface of the mesh, which gave the appearance of natural skin texture. 
         Finally, we applied a custom
         texture mapping to the resulting geometry, allowing us to apply custom
         textures, such as tattoos, to the face.
@@ -113,6 +113,22 @@
           We used CloudCompare to remove outliers from the mesh and refine the geometry.
         </p>
 
+        <h3>Texture Mapping the Mesh</h3>
+        <p>
+          We used both the colored point cloud and target mesh, and transfered the colors to each mesh vertex
+          by weighting the nearest point cloud samples. First we tried using a frontal source image, and 
+          used projection methods and coordinate transforms to map the colors onto the mesh. However, this 
+          was extremely difficult to do, and we were unable to get good results. Thus, we stuck to using the colored point cloud as 
+          our source of color information.
+        </p>
+
+        <h3>Perlin Noise</h3>
+        <p>
+          Perlin noise is a type of noise that is used to create natural-looking textures.
+          We used Perlin noise to create a bump map for the surface of the mesh, which gave the appearance of natural skin texture.
+        </p>
+
+
       </p>
 
       <h2>Results</h2>
@@ -121,7 +137,7 @@
       <h2>References</h2>
       <p>
         1. DUSt3R 2. MAST3R 3. CloudCompare: https://github.com/cloudcompare/cloudcompare 4. COLMAP 5. FaceScape 6. Open3D 7.
-        Perlin Noise 8. Poisson Reconstruction: https://github.com/mkazhdan/PoissonRecon
+        Perlin Noise: https://rtouti.github.io/graphics/perlin-noise-algorithm 8. Poisson Reconstruction: https://github.com/mkazhdan/PoissonRecon
       </p>
 
       <h2>Team Contributions</h2>
@@ -140,8 +156,7 @@
           texture-mapping routines: created both orthographic and pinhole UV
           projection methods, handled coordinate transforms
           (reflect/rotate/translate), in an attempt to pick up skin-tone and hair
-          coloration from a frontal photograph. However, this did not succeed, and
-          the mesh did not change colors.</li>
+          coloration from a frontal photograph.</li>
           <li>
             Built an RGB overlay tattoo:
             composited an input of a transparent facial tattoo into a texture atlas,

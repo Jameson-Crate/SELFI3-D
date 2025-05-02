@@ -69,49 +69,41 @@
       </div>
 
       <br />
-
-      <h2>Different Reconstruction Methods</h2>
-
-      <h2>Preliminary Results</h2>
-      Our preliminary results explored four different 3D reconstruction
-      techniques: COLMAP, NKSR, FaceScape and DUSt3R.
-
-      <h3>COLMAP</h3>
+      <h2>Abstract</h2>
       <p>
-        COLMAP is a traditional reconstruction method that relies on solving a
-        joint-optimization problem in order to solve for the structure of a
-        scene as well the extrinisc parameters of a set of cameras. We attempted
-        to use COLMAP to take multiple input views and reconstruct a point cloud
-        which we could then use to generate a mesh. However, the point cloud
-        ended up being too sparse in this case resulting in poor mesh
-        reconstruction in the next step.
+        SELFI3-D is a project focused on creating high-quality 3D face reconstructions from various views of a person, as well as applying custom texture mapping to the resulting geometry.  
+        Our goal is to develop a pipeline that can generate accurate 3D face models and enable creative applications such as virtual face tattoos. 
+        After testing different 3D reconstruction methods, we have selected DUSt3R as our primary reconstruction method due to its superior performance with uncalibrated image pairs.
       </p>
 
-      <h3>NKSR</h3>
+
+
+      <h2>Technical Approach</h2>
       <p>
-        NKSR is a 3-D mesh construction technique that recovers a 3-D surface
-        from an input point cloud. NKSR is known for its ability to generalize,
-        handle noise effectively, and minimize training requirements which is
-        why it can still produce high quality outputs from a sparse,
-        high-quality or noise point cloud.
+        Our pipeline is broken down into three main steps: 
+        1) Reconstruction, 2) Texture Mapping, 3) Custom Application.
+      </p>
+      
+      <h2>Results</h2>
+      <p>
+       blah blah blah 
       </p>
 
-      <h3>Texture Mapping</h3>
+
+      <h2>References</h2>
       <p>
-        We attempted to use texture mapping in order to color the vertices the
-        mesh we generated from NKSR. We constructed a KD-tree to efficiently
-        look up mesh vertices' neighbors in the point cloud and colored the
-        corresponding vertex with the distance weighted color of its three
-        nearest neighbors.
+        1. DUSt3R
+        2. MAST3R
+        3. CloudCompare
+        4. 
       </p>
 
-      <h3>FaceScape</h3>
-      <p>
-        There were several intial difficulties with Python dependencies.
-        Additionally, the model generated a mask that was looked generic and did
-        not align closely with the subject's facial features.
+     
+      
+
+     
         
-      </p>
+
       <td style="text-align: center">
         <img src="facescape.jpeg" width="400px" />
         <figcaption>
@@ -123,42 +115,7 @@
         </figcaption>
       </td>
 
-      <h3>DUSt3R</h3>
-      <p>
-        DUSt3R (Dense and Unconstrained Stereo 3-D Reconstruction) is a
-        cutting-edge method for 3-D scene reconsturction. Unlike traditional
-        approaches that require known camera cameras and poses, DUSt3R
-        reconstructs dense 3-D geometry directly from uncalibratd image pairs.
-        Its key novelties include direct regression of dense 3D point maps from
-        image pair and its transformer based architecture. Additionally, it also
-        produces depth and confidence mapping for each of the input images.
-        These innovations make DUSt3R state-of-the-art by enabling fast,
-        end-to-end and versatile 3-D reconstruction from arbitrary image
-        collections.
-
-        
-      </p>
-      <td style="text-align: center">
-        <img src="dust3r.png" width="400px" />
-      </td>
-
-      <p>
-        As a result of its accurate results, we decided to move forward with
-        using DUSt3R.
-      </p>
-
-      <h2>Progress Relative to our Plan and Timeline</h2>
-      <p>
-        We are currently on track with our agreed-upon timeline. We have
-        currently surveyed the current State-Of-The-Art reconstruction models,
-        as well as tested them and selected which one best suits our purposes.
-        The current step we are on is working on the initial texture mapping
-        steps and planning our code design for implementing two rounds of custom
-        texture mapping. We will then move on to test our pipeline on several
-        different subjects as well as attack some of our stretch goals, such as
-        rigging the mesh for realistic face movements or creating a fluid
-        texture map to give the illusion of a moving tattoo.
-      </p>
+      
     </div>
   </body>
 </html>

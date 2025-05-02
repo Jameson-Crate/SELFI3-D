@@ -165,6 +165,8 @@
         Later utilized CloudCompare software for a more robust solution, where I imported the point cloud, debugged and filtered noisy or outlying points, then applied Poisson Reconstruction. 
         This process required significant experimentation with reconstruction depth, by varying the Octree depth to achieve the best results. 
         After reconstruction, I trimmed the model based on the confidence values of the reconstruction to remove low-quality mesh regions, resulting in a high-fidelity 3D facial mesh that was ready for the next step of the pipeline which was bump mapping.
+
+        In order to feed into CloudCompare, I created a script to estimate the normals of each point in our dense point cloud that was fed into CloudCompare. 
         </li>
       </ol>
 

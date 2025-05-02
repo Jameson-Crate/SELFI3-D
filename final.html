@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=default"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      h1 {
+        text-align: center;
+      }
+
+      .container {
+        margin: 0 auto;
+        padding: 60px 20%;
+      }
+
+      figure {
+        text-align: center;
+      }
+
+      img {
+        display: inline-block;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>SELFI3-D Milestone</h1>
+      <div style="text-align: center">
+        <b>Team Members</b>: Akshaan Ahuja, Jameson Crate, Michelle Chen,
+        Valerie Li
+      </div>
+
+      <br />
+      <div style="text-align: center; margin: 20px 0">
+        <p><b>Project Links:</b></p>
+        <p>
+          Video Presentation:
+          <a
+            href="https://drive.google.com/file/d/1Eno7R0phGs-EzA_l5CGQLaA5SdsYrIKr/view?usp=sharing"
+          >
+            https://drive.google.com/file/d/1Eno7R0phGs-EzA_l5CGQLaA5SdsYrIKr/view?usp=sharing</a
+          >
+        </p>
+        <p>
+          Slides:
+          <a
+            href="https://docs.google.com/presentation/d/1a-stRxFNvy2kxD5SsM-ItsuNpEQqmf0-zQjJ58QCRrE/edit?usp=sharing"
+            >https://docs.google.com/presentation/d/1a-stRxFNvy2kxD5SsM-ItsuNpEQqmf0-zQjJ58QCRrE/edit?usp=sharing</a
+          >
+        </p>
+        <p>
+          GitHub Repository:
+          <a href="https://github.com/Jameson-Crate/SELFI3-D/"
+            >https://github.com/Jameson-Crate/SELFI3-D/</a
+          >
+        </p>
+        <p>
+          Project Webpage:
+          <a href="https://jameson-crate.github.io/SELFI3-D/milestone.html"
+            >https://jameson-crate.github.io/SELFI3-D/milestone.html</a
+          >
+        </p>
+      </div>
+
+      <br />
+      <h2>Abstract</h2>
+      <p>
+        SELFI3-D is a project focused on creating high-quality 3D face reconstructions from various views of a person, as well as applying custom texture mapping to the resulting geometry.  
+        Our goal is to develop a pipeline that can generate accurate 3D face models and enable creative applications such as virtual face tattoos. Our pipeline is broken down into a few key steps. Firstly, from a set of input views, we constructed a sparse point cloud using DUSt3R, providing us with a starting point for our 3D reconstruction.
+        Next, we used MAST3R to produce a dense point cloud from the same set of input views, creating a dense 3D mesh.
+        We then used CloudCompare to remove outliers from the mesh and refine the geometry.
+        Finally, we applied a custom texture mapping to the resulting geometry, allowing us to apply custom textures, such as tattoos, to the face.
+
+      </p>
+
+
+
+      <h2>Technical Approach</h2>
+      <p>
+        Our pipeline is broken down into a few key steps. Firstly, from a set of input views, we constructed a sparse point cloud using DUSt3R, providing us with a starting point for our 3D reconstruction.
+        Next, we used MAST3R to produce a dense point cloud from the same set of input views, creating a dense 3D mesh.
+        We then used CloudCompare to remove outliers from the mesh and refine the geometry.
+        Finally, we applied a custom texture mapping to the resulting geometry, allowing us to apply custom textures, such as tattoos, to the face.
+      </p>
+      
+      <h2>Results</h2>
+      <p>
+       blah blah blah 
+      </p>
+
+
+      <h2>References</h2>
+      <p>
+        1. DUSt3R
+        2. MAST3R
+        3. CloudCompare
+        4. 
+      </p>
+
+     
+      
+
+     
+        
+
+      <td style="text-align: center">
+        <img src="facescape.jpeg" width="400px" />
+        <figcaption>
+          The mask is overlayed on the right image. The mask was generated
+          from first fitting the FaceScape model with 2-D facial landmarks
+          from the input picture. Then, the resulting mesh was normalized and
+          positioned in a straight on view. Finally, the depth map is
+          overlayed onto the original image.
+        </figcaption>
+      </td>
+
+      
+    </div>
+  </body>
+</html>

@@ -72,16 +72,21 @@
       <h2>Abstract</h2>
       <p>
         SELFI3-D is a project focused on creating high-quality 3D face reconstructions from various views of a person, as well as applying custom texture mapping to the resulting geometry.  
-        Our goal is to develop a pipeline that can generate accurate 3D face models and enable creative applications such as virtual face tattoos. 
-        After testing different 3D reconstruction methods, we have selected DUSt3R as our primary reconstruction method due to its superior performance with uncalibrated image pairs.
+        Our goal is to develop a pipeline that can generate accurate 3D face models and enable creative applications such as virtual face tattoos. Our pipeline is broken down into a few key steps. Firstly, from a set of input views, we constructed a sparse point cloud using DUSt3R, providing us with a starting point for our 3D reconstruction.
+        Next, we used MAST3R to produce a dense point cloud from the same set of input views, creating a dense 3D mesh.
+        We then used CloudCompare to remove outliers from the mesh and refine the geometry.
+        Finally, we applied a custom texture mapping to the resulting geometry, allowing us to apply custom textures, such as tattoos, to the face.
+
       </p>
 
 
 
       <h2>Technical Approach</h2>
       <p>
-        Our pipeline is broken down into three main steps: 
-        1) Reconstruction, 2) Texture Mapping, 3) Custom Application.
+        Our pipeline is broken down into a few key steps. Firstly, from a set of input views, we constructed a sparse point cloud using DUSt3R, providing us with a starting point for our 3D reconstruction.
+        Next, we used MAST3R to produce a dense point cloud from the same set of input views, creating a dense 3D mesh.
+        We then used CloudCompare to remove outliers from the mesh and refine the geometry.
+        Finally, we applied a custom texture mapping to the resulting geometry, allowing us to apply custom textures, such as tattoos, to the face.
       </p>
       
       <h2>Results</h2>

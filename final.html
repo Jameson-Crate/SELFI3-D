@@ -105,38 +105,134 @@
 
       <h2>References</h2>
       <p>
-        1. DUSt3R 2. MAST3R 3. CloudCompare 4. COLMAP 5. FaceScape 6. Open3D 7.
-        Perlin Noise
+        Vincent, I., Zollhöfer, M., Thies, J., Theobalt, C., & Nießner, M.
+        (2023).
+        <em>DUSt3R: 3D reconstruction of dynamic humans from monocular video</em
+        >.
+        <a href="https://arxiv.org/abs/2304.06706" target="_blank"
+          >https://arxiv.org/abs/2304.06706</a
+        >
+      </p>
+
+      <p>
+        Zhao, Y., Li, R., Dou, M., Yu, J., Yu, N., Zhang, H., & Lin, S. (2023).
+        <em
+          >MAST3R: Masked space-time-steered representation for deep dynamic 3D
+          reconstruction</em
+        >.
+        <a href="https://arxiv.org/abs/2303.16165" target="_blank"
+          >https://arxiv.org/abs/2303.16165</a
+        >
+      </p>
+
+      <p>
+        CloudCompare. (n.d.).
+        <em
+          >CloudCompare: Open source 3D point cloud and mesh processing
+          software</em
+        >.
+        <a href="https://github.com/CloudCompare/CloudCompare" target="_blank"
+          >https://github.com/CloudCompare/CloudCompare</a
+        >
+      </p>
+
+      <p>
+        Schönberger, J. L., & Frahm, J.-M. (2016).
+        <em>Structure-from-motion revisited</em>. In Proceedings of the IEEE
+        Conference on Computer Vision and Pattern Recognition (CVPR).
+        <a href="https://arxiv.org/abs/1606.01260" target="_blank"
+          >https://arxiv.org/abs/1606.01260</a
+        >
+      </p>
+
+      <p>
+        Yang, H., Liang, X., Ma, J., Zhang, Y., Lai, Y.-K., & Liu, R. (2020).
+        <em
+          >FaceScape: A large-scale high quality 3D face dataset and detailed
+          riggable 3D face prediction</em
+        >. In Proceedings of the IEEE/CVF Conference on Computer Vision and
+        Pattern Recognition (CVPR).
+        <a
+          href="https://openaccess.thecvf.com/content_CVPR_2020/html/Yang_FaceScape_A_Large-Scale_High_Quality_3D_Face_Dataset_and_Detailed_CVPR_2020_paper.html"
+          target="_blank"
+          >https://openaccess.thecvf.com/.../Yang_FaceScape...</a
+        >
+      </p>
+
+      <p>
+        Zhou, Q.-Y., Park, J., & Koltun, V. (2018).
+        <em>Open3D: A modern library for 3D data processing</em>.
+        <a href="https://github.com/isl-org/Open3D" target="_blank"
+          >https://github.com/isl-org/Open3D</a
+        >
+      </p>
+
+      <p>
+        Perlin, K. (1985). An image synthesizer.
+        <em>ACM SIGGRAPH Computer Graphics, 19</em>(3), 287–296.
+        <a href="https://doi.org/10.1145/325165.325247" target="_blank"
+          >https://doi.org/10.1145/325165.325247</a
+        >
       </p>
 
       <h2>Team Contributions</h2>
+
+      <p>Michelle Chen:</p>
+      <ol>
+        <li>
+          Created Dust3R mesh reconstruction using input images by looking
+          through existing code and implementing for our use case. Additionally
+          created confidence maps of the reliability of each component of the
+          mesh reliability.
+        </li>
+        <li>
+          Attempted image segmentation using SAM2 to remove background (areas of
+          low confidence) from input images before generating mesh and generated
+          a new mesh without the background included.
+        </li>
+        <li>
+          Attempted pipelining the entire process and connecting backend
+          endpoints with the frontend user experience. However, there were
+          issues displaying the point clouds on gradio and we did not have the
+          computational resources for a fully pipelined demo.
+        </li>
+        <li>
+          Built the tattoo projection pipeline that took a 2d tattoo image and
+          projected it onto the 3d point cloud by mapping image pixels to 3D
+          points based on UV mapping techniques.
+        </li>
+      </ol>
+
       <p>Valerie Li:</p>
       <ol>
-        <li>Worked on creating a 3D mask overlay through FaceScape's
-          bilinear model. This involved updating or refactoring outdated
-          dependencies, fixing API breaks, and tuning model hyper-parameters to
-          fit our dataset. </li>
-        <li>Designed and implemented procedural bump mapping by
-          displacing each mesh vertex along its normal using a 3D Perlin noise
-          field. Initially, tried a 2D random noise approach, which produced
-          streaks, instead of true, isotropic skin-like micro-detail, which the 3D
-          Perlin noise field did!</li>
-        <li>Developed and debugged per-vertex
-          texture-mapping routines: created both orthographic and pinhole UV
-          projection methods, handled coordinate transforms
-          (reflect/rotate/translate), in an attempt to pick up skin-tone and hair
-          coloration from a frontal photograph. However, this did not succeed, and
-          the mesh did not change colors.</li>
-          <li>
-            Built an RGB overlay tattoo:
-            composited an input of a transparent facial tattoo into a texture atlas,
-            generated the corresponding .obj file with embedded UVs, and attempted
-            to bake the overlay onto the mesh. Unfortunately, this also did not work
-            on the mesh. Ultimately, unable to succeed in rendering the mesh in a
-            different color.
-          </li>
+        <li>
+          Worked on creating a 3D mask overlay through FaceScape's bilinear
+          model. This involved updating or refactoring outdated dependencies,
+          fixing API breaks, and tuning model hyper-parameters to fit our
+          dataset.
+        </li>
+        <li>
+          Designed and implemented procedural bump mapping by displacing each
+          mesh vertex along its normal using a 3D Perlin noise field. Initially,
+          tried a 2D random noise approach, which produced streaks, instead of
+          true, isotropic skin-like micro-detail, which the 3D Perlin noise
+          field did!
+        </li>
+        <li>
+          Developed and debugged per-vertex texture-mapping routines: created
+          both orthographic and pinhole UV projection methods, handled
+          coordinate transforms (reflect/rotate/translate), in an attempt to
+          pick up skin-tone and hair coloration from a frontal photograph.
+          However, this did not succeed, and the mesh did not change colors.
+        </li>
+        <li>
+          Built an RGB overlay tattoo: composited an input of a transparent
+          facial tattoo into a texture atlas, generated the corresponding .obj
+          file with embedded UVs, and attempted to bake the overlay onto the
+          mesh. Unfortunately, this also did not work on the mesh. Ultimately,
+          unable to succeed in rendering the mesh in a different color.
+        </li>
       </ol>
-      </p>
 
       <td style="text-align: center">
         <img src="facescape.jpeg" width="400px" />

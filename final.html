@@ -107,11 +107,18 @@
           We then used MAST3R to produce a dense point cloud from the same set of input views.
         </p>
 
+        <h3>Poisson Reconstruction</h3>
+        <p>
+          Poisson Reconstruction is a method for creating a 3D mesh from a point cloud, where the vertices of the mesh are sampled from the points in the point cloud.
+          We attempted to implement Poisson Reconstruction to create a 3D mesh from the dense point cloud produced by MAST3R.
+          However, we were unable to get good results, and thus used CloudCompare's built-in Poisson Reconstruction instead.
+        </p>
+
         <h3>CloudCompare</h3>
         <p>
           CloudCompare is an open-source tool for creating and editing 3D point clouds. 
-          We used CloudCompare to remove outliers from the mesh and refine the geometry.
-          
+          We used CloudCompare to remove outliers from the mesh and refine the geometry before applying Poisson Reconstruction with an octree depth of 8.
+          In order to feed into CloudCompare's Poisson Reconstruction, I created a script to estimate the normals of each point in our point cloud that was also fed into CloudCompare. 
         </p>
 
         <h3>Texture Mapping the Mesh</h3>

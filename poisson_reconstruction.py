@@ -3,89 +3,35 @@
 import open3d as o3d
 import numpy as np
 
-
 def poisson_surface_reconstruction(points, normals=None, depth=8, scale=1.1, linear_fit=False, n_threads=-1):
-    """
-    Perform Poisson surface reconstruction on a point cloud.
+    pcd = o3d.geometry.PointCloud() #create a point cloud object
+    pcd.points = o3d.utility.Vector3dVector(points) #set the points of the point cloud to the points in the point cloud
     
-    Parameters
-    ----------
-    points : numpy.ndarray
-        Nx3 array of point coordinates.
-    normals : numpy.ndarray, optional
-        Nx3 array of point normals. If None, normals will be estimated.
-    depth : int, default=8
-        Maximum depth of the octree used for reconstruction.
-    scale : float, default=1.1
-        Scale factor to apply to the octree.
-    linear_fit : bool, default=False
-        If True, use linear interpolation to fit the implicit function.
-    n_threads : int, default=-1
-        Number of threads to use. -1 means use all available threads.
-    
-    Returns
-    -------
-    mesh : open3d.geometry.TriangleMesh
-        The reconstructed mesh.
-    """
-    # Create point cloud object
-    pcd = o3d.geometry.PointCloud()
-    pcd.points = o3d.utility.Vector3dVector(points)
-    
-    # Estimate normals if not provided
+    # Estimate normals if not provided - this doesnt work so made another function below
     if normals is None:
-        pcd.estimate_normals()
+        pcd.estimate_normals() #built in function to estimate normals
     else:
-        pcd.normals = o3d.utility.Vector3dVector(normals)
+        pcd.normals = o3d.utility.Vector3dVector(normals) #set the normals of the point cloud to the normals in the point cloud 
     
     # Perform Poisson surface reconstruction
     mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(
         pcd, depth=depth, scale=scale, linear_fit=linear_fit, n_threads=n_threads
-    )
+    ) #built in function to create a mesh from a point cloud
     
     return mesh
 
 
 def save_mesh(mesh, output_path):
-    """
-    Save a mesh to a file.
-    
-    Parameters
-    ----------
-    mesh : open3d.geometry.TriangleMesh
-        The mesh to save.
-    output_path : str
-        Path to save the mesh to.
-    
-    Returns
-    -------
-    bool
-        True if successful.
-    """
     return o3d.io.write_triangle_mesh(output_path, mesh)
 
 
 def load_point_cloud(input_path):
-    """
-    Load a point cloud from a file.
-    
-    Parameters
-    ----------
-    input_path : str
-        Path to the point cloud file.
-    
-    Returns
-    -------
-    points : numpy.ndarray
-        Nx3 array of point coordinates.
-    normals : numpy.ndarray or None
-        Nx3 array of point normals if available, None otherwise.
-    """
+   
     # Try to load the point cloud
     try:
-        pcd = o3d.io.read_point_cloud(input_path)
-        points = np.asarray(pcd.points)
-        normals = np.asarray(pcd.normals) if pcd.has_normals() else None
+        pcd = o3d.io.read_point_cloud(input_path) #built in function to read a point cloud from a file
+        points = np.asarray(pcd.points) #convert the points of the point cloud to a numpy array
+        normals = np.asarray(pcd.normals) if pcd.has_normals() else None #convert the normals of the point cloud to a numpy array if the point cloud has normals
         return points, normals
     except Exception as e:
         print(f"Error loading point cloud: {e}")
@@ -93,23 +39,6 @@ def load_point_cloud(input_path):
 
 
 def transfer_colors(mesh, pcd, k=3):
-    """
-    Transfer colors from point cloud to mesh using nearest neighbors.
-    
-    Parameters
-    ----------
-    mesh : open3d.geometry.TriangleMesh
-        The mesh to color.
-    pcd : open3d.geometry.PointCloud
-        The point cloud with colors.
-    k : int, default=3
-        Number of nearest neighbors to consider for color averaging.
-    
-    Returns
-    -------
-    mesh : open3d.geometry.TriangleMesh
-        The colored mesh.
-    """
     if not pcd.has_colors():
         print("Point cloud has no colors to transfer")
         return mesh
@@ -122,7 +51,6 @@ def transfer_colors(mesh, pcd, k=3):
     
     # Initialize vertex colors
     vertex_colors = np.zeros((len(mesh_vertices), 3))
-    
     # For each vertex in the mesh, find the nearest points in the point cloud
     for i, vertex in enumerate(mesh_vertices):
         # Find k nearest neighbors
@@ -136,53 +64,17 @@ def transfer_colors(mesh, pcd, k=3):
     
     # Set the mesh colors
     mesh.vertex_colors = o3d.utility.Vector3dVector(vertex_colors)
-    
     return mesh
 
 
-def remove_outliers(pcd, nb_neighbors=20, std_ratio=2.0):
-    """
-    Remove outliers from point cloud using statistical outlier removal.
-    
-    Parameters
-    ----------
-    pcd : open3d.geometry.PointCloud
-        The input point cloud.
-    nb_neighbors : int, default=20
-        Number of neighbors to consider.
-    std_ratio : float, default=2.0
-        Standard deviation ratio threshold.
-    
-    Returns
-    -------
-    pcd_clean : open3d.geometry.PointCloud
-        The cleaned point cloud.
-    """
+def remove_outliers(pcd, nb_neighbors=20, std_ratio=2.0): #THIS FUNCTION DOES NOT WORK
     print(f"Removing outliers (nb_neighbors={nb_neighbors}, std_ratio={std_ratio})...")
     cl, ind = pcd.remove_statistical_outlier(nb_neighbors=nb_neighbors, std_ratio=std_ratio)
     return cl
 
 
 def estimate_normals(points, k=30, orient_with_viewpoint=True, viewpoint=None):
-    """
-    Estimate normals for a point cloud.
-    
-    Parameters
-    ----------
-    points : numpy.ndarray
-        Nx3 array of point coordinates.
-    k : int, default=30
-        Number of nearest neighbors to use for normal estimation.
-    orient_with_viewpoint : bool, default=True
-        Whether to orient normals toward a viewpoint.
-    viewpoint : numpy.ndarray, optional
-        3D viewpoint coordinates. If None, (0,0,0) is used.
-    
-    Returns
-    -------
-    normals : numpy.ndarray
-        Nx3 array of estimated normals.
-    """
+   
     print(f"Estimating normals (k={k})...")
     
     # Create point cloud object
@@ -190,12 +82,12 @@ def estimate_normals(points, k=30, orient_with_viewpoint=True, viewpoint=None):
     pcd.points = o3d.utility.Vector3dVector(points)
     
     # Estimate normals - FIX: use knn instead of k
-    pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamKNN(knn=k))
+    pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamKNN(knn=k)) #this is a better function to do
     
     # Orient normals
     if orient_with_viewpoint:
         if viewpoint is None:
-            viewpoint = [0, 0, 0]  # Default viewpoint at origin
+            viewpoint = [0, 0, 0]  
         pcd.orient_normals_towards_camera_location(viewpoint)
     
     # Try to make normals consistent
@@ -207,26 +99,7 @@ def estimate_normals(points, k=30, orient_with_viewpoint=True, viewpoint=None):
     return np.asarray(pcd.normals)
 
 
-def save_point_cloud_with_normals(file_path, points, normals, colors=None):
-    """
-    Save a point cloud with normals to a file.
-    
-    Parameters
-    ----------
-    file_path : str
-        Path to save the point cloud to.
-    points : numpy.ndarray
-        Nx3 array of point coordinates.
-    normals : numpy.ndarray
-        Nx3 array of point normals.
-    colors : numpy.ndarray, optional
-        Nx3 array of point colors.
-    
-    Returns
-    -------
-    bool
-        True if successful.
-    """
+def save_point_cloud_with_normals(file_path, points, normals, colors=None): #this is what will be put into cloud compare
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(points)
     pcd.normals = o3d.utility.Vector3dVector(normals)
@@ -236,9 +109,8 @@ def save_point_cloud_with_normals(file_path, points, normals, colors=None):
     return o3d.io.write_point_cloud(file_path, pcd)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": 
     import argparse
-    
     parser = argparse.ArgumentParser(description="Point Cloud Processing with Normal Estimation")
     parser.add_argument("input", help="Input point cloud file")
     parser.add_argument("output", help="Output point cloud file with normals")
@@ -258,13 +130,13 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    # Load point cloud
+  
     points, colors = load_point_cloud(args.input)
     
     if points is not None:
         print(f"Loaded {len(points)} points")
         
-        # Create point cloud object for later use
+
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(points)
         if colors is not None:
@@ -301,16 +173,13 @@ if __name__ == "__main__":
             )
             
             # Remove low-density vertices if threshold is provided
-            if args.density_threshold > 0 and hasattr(mesh, 'vertex_density'):
-                densities = np.asarray(mesh.vertex_density)
-                vertices_to_remove = densities < args.density_threshold
-                mesh.remove_vertices_by_mask(vertices_to_remove)
+   
             
             # Transfer colors if requested
             if args.color:
                 # Check if point cloud has colors
                 try:
-                    if pcd.has_colors():
+                    if pcd.has_colors(): 
                         mesh = transfer_colors(mesh, pcd, k=args.color_k)
                         print("Transferred colors from point cloud to mesh")
                 except Exception as e:

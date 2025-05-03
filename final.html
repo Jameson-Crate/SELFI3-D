@@ -75,7 +75,7 @@
         reconstructions from various views of a person, as well as applying
         custom texture mapping to the resulting geometry. Our goal is to develop
         a pipeline that can generate accurate 3D face models and enable creative
-        applications on these models, such as virtual face tattoos. 
+        applications on these models, such as virtual face tattoos.
       </p>
 
       <h2>Technical Approach</h2>
@@ -105,37 +105,39 @@
       <p>
         We experimented with using the Segment Anything Model 2 (SAM2) to
         segment out the background from our input images before reconstruction.
-        The goal was to isolate just the face and remove low confidence components. SAM2 was able to effectively separate the
-        foreground (face) from the background in our input images. However, when
-        we attempted to reconstruct the 3D model using these segmented images in
-        DUSt3R, we found that the results were significantly worse than using
-        the original unsegmented images. This was likely because removing the
-        background eliminated important visual features and depth cues that
-        DUSt3R uses to establish correspondences between different views and
-        estimate 3D structure. The lack of background context made it more
-        difficult for the system to determine relative camera positions and
-        perform accurate triangulation. 
+        The goal was to isolate just the face and remove low confidence
+        components. SAM2 was able to effectively separate the foreground (face)
+        from the background in our input images. However, when we attempted to
+        reconstruct the 3D model using these segmented images in DUSt3R, we
+        found that the results were significantly worse than using the original
+        unsegmented images. This was likely because removing the background
+        eliminated important visual features and depth cues that DUSt3R uses to
+        establish correspondences between different views and estimate 3D
+        structure. The lack of background context made it more difficult for the
+        system to determine relative camera positions and perform accurate
+        triangulation.
       </p>
-      <div style="width: 100%">
-        <img
-          src="background-segmented.png"
-          style="width: 100%"
-        />
-      </div>
 
-        <h3>Poisson Reconstruction</h3>
-        <p>
-          Poisson Reconstruction is an algorithm for creating a 3D mesh from a point cloud, where the vertices of the mesh are sampled from the points in the point cloud.
-          We attempted to implement Poisson Reconstruction to create a 3D mesh from the dense point cloud produced by MAST3R.
-          However, we were unable to get good results, so we decided to use CloudCompare's built-in Poisson Reconstruction instead.
-        </p>
+      <h3>Poisson Reconstruction</h3>
+      <p>
+        Poisson Reconstruction is an algorithm for creating a 3D mesh from a
+        point cloud, where the vertices of the mesh are sampled from the points
+        in the point cloud. We attempted to implement Poisson Reconstruction to
+        create a 3D mesh from the dense point cloud produced by MAST3R. However,
+        we were unable to get good results, so we decided to use CloudCompare's
+        built-in Poisson Reconstruction instead.
+      </p>
 
-        <h3>CloudCompare</h3>
-        <p>
-          CloudCompare is an open-source software, similar to Blender or MeshLab,for creating and editing 3D point clouds. 
-          We used CloudCompare to remove outliers from the mesh and refine the geometry before applying Poisson Reconstruction with an octree depth of 8.
-          In order to feed into CloudCompare's Poisson Reconstruction, I created a script to estimate the normals of each point in our point cloud that was also fed into CloudCompare. 
-        </p>
+      <h3>CloudCompare</h3>
+      <p>
+        CloudCompare is an open-source software, similar to Blender or
+        MeshLab,for creating and editing 3D point clouds. We used CloudCompare
+        to remove outliers from the mesh and refine the geometry before applying
+        Poisson Reconstruction with an octree depth of 8. In order to feed into
+        CloudCompare's Poisson Reconstruction, I created a script to estimate
+        the normals of each point in our point cloud that was also fed into
+        CloudCompare.
+      </p>
 
       <h3>Texture Mapping the Mesh</h3>
       <p>
@@ -163,21 +165,23 @@
         inked and linearly blends black over the original mesh color given a
         darkness threshold. The modified mesh is saved and rendered with Open3D.
       </p>
-      <div style="width: 100%">
-        <img
-          src="final.png"
-          alt="Tattoo projection example showing a tattoo being mapped onto a 3D face model"
-          style="width: 100%"
-        />
-      </div>
 
       <h2>Results</h2>
       <p>blah blah blah</p>
 
       <h2>References</h2>
       <p>
-        1. DUSt3R https://github.com/naver/dust3r 2. MAST3R https://github.com/naver/mast3r 3. CloudCompare: https://github.com/cloudcompare/cloudcompare 4. COLMAP https://colmap.github.io/ 5. FaceScape https://github.com/zhuoyan/FaceScape 6. Open3D https://github.com/isl-org/Open3D 7.
-        Perlin Noise: https://rtouti.github.io/graphics/perlin-noise-algorithm 8. Poisson Reconstruction: https://github.com/mkazhdan/PoissonRecon
+        <ul>
+          <li>DUSt3R: https://github.com/naver/dust3r</li>
+          <li>MAST3R: https://github.com/naver/mast3r</li>
+          <li>CloudCompare: https://github.com/cloudcompare/cloudcompare</li>
+          <li>COLMAP: https://colmap.github.io/</li>
+          <li>FaceScape: https://github.com/zhuoyan/FaceScape</li>
+          <li>Open3D: https://github.com/isl-org/Open3D</li>
+          <li>Perlin Noise: https://rtouti.github.io/graphics/perlin-noise-algorithm</li>
+          <li>Poisson Reconstruction: https://github.com/mkazhdan/PoissonRecon</li>
+          <li>SAM2: https://github.com/facebookresearch/segment-anything</li>
+        </ul>
       </p>
 
       <h2>Team Contributions</h2>
@@ -274,43 +278,48 @@
           as well as the difference in camera positions between views.
         </li>
         <li>
-        Implemented Poisson Reconstruction to convert our dense point cloud from MAST3R into a complete mesh. 
-        Initially attempted a novel Python implementation based on the logic from the state-of-the-art Poisson Reconstruction repository: https://github.com/mkazhdan/PoissonRecon, working through the mathematical foundations of the algorithm. 
-        Later utilized CloudCompare software for a more robust solution, where I imported the point cloud, debugged and filtered noisy or outlying points, then applied Poisson Reconstruction. 
-        This process required significant experimentation with reconstruction depth, by varying the Octree depth to achieve the best results. 
-        After reconstruction, I trimmed the model based on the confidence values of the reconstruction to remove low-quality mesh regions, resulting in a high-fidelity 3D facial mesh that was ready for the next step of the pipeline which was bump mapping.
-
-        In order to feed into CloudCompare, I created a script to estimate the normals of each point in our dense point cloud that was fed into CloudCompare. 
+          Implemented Poisson Reconstruction to convert our dense point cloud
+          from MAST3R into a complete mesh. Initially attempted a novel Python
+          implementation based on the logic from the state-of-the-art Poisson
+          Reconstruction repository: https://github.com/mkazhdan/PoissonRecon,
+          working through the mathematical foundations of the algorithm. Later
+          utilized CloudCompare software for a more robust solution, where I
+          imported the point cloud, debugged and filtered noisy or outlying
+          points, then applied Poisson Reconstruction. This process required
+          significant experimentation with reconstruction depth, by varying the
+          Octree depth to achieve the best results. After reconstruction, I
+          trimmed the model based on the confidence values of the reconstruction
+          to remove low-quality mesh regions, resulting in a high-fidelity 3D
+          facial mesh that was ready for the next step of the pipeline which was
+          bump mapping. In order to feed into CloudCompare, I created a script
+          to estimate the normals of each point in our dense point cloud that
+          was fed into CloudCompare.
         </li>
       </ol>
 
       <p>Jameson Crate:</p>
       <ol>
         <li>
-          Tested COLMAP and MAST3R to get a point cloud from our sparse views. At first our point cloud results from COLMAP
-          were very noisy, so I used filtering techniques such as nearest neighbor and statistical outlier rejection. The
-          result of this step was a dense point cloud which we could use for further mesh reconstruction and texture mapping.
-         </li>
-        <li>
-          Implemented mesh texture mapping from a point cloud by finding each vertice's nearest neighbors in the point cloud and 
-          weighting each points' color by distance.
+          Tested COLMAP and MAST3R to get a point cloud from our sparse views.
+          At first our point cloud results from COLMAP were very noisy, so I
+          used filtering techniques such as nearest neighbor and statistical
+          outlier rejection. The result of this step was a dense point cloud
+          which we could use for further mesh reconstruction and texture
+          mapping.
         </li>
         <li>
-          Further filtered point clouds through plane / wall removal using RANSAC for plane prediction in the scene. After predicting
-          the location of the wall / plane in the scene we filter points some distance above and below the plane to remove wall points.
+          Implemented mesh texture mapping from a point cloud by finding each
+          vertice's nearest neighbors in the point cloud and weighting each
+          points' color by distance.
+        </li>
+        <li>
+          Further filtered point clouds through plane / wall removal using
+          RANSAC for plane prediction in the scene. After predicting the
+          location of the wall / plane in the scene we filter points some
+          distance above and below the plane to remove wall points.
         </li>
       </ol>
 
-      <td style="text-align: center">
-        <img src="facescape.jpeg" width="400px" />
-        <figcaption>
-          The mask is overlayed on the right image. The mask was generated from
-          first fitting the FaceScape model with 2-D facial landmarks from the
-          input picture. Then, the resulting mesh was normalized and positioned
-          in a straight on view. Finally, the depth map is overlayed onto the
-          original image.
-        </figcaption>
-      </td>
     </div>
   </body>
 </html>

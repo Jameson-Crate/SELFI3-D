@@ -164,7 +164,6 @@
             different color.
           </li>
       </ol>
-      </p>
 
       <p>Akshaan Ahuja:</p>
       <ol>
@@ -180,6 +179,23 @@
         After reconstruction, I trimmed the model based on the confidence values of the reconstruction to remove low-quality mesh regions, resulting in a high-fidelity 3D facial mesh that was ready for the next step of the pipeline which was bump mapping.
 
         In order to feed into CloudCompare, I created a script to estimate the normals of each point in our dense point cloud that was fed into CloudCompare. 
+        </li>
+      </ol>
+
+      <p>Jameson Crate:</p>
+      <ol>
+        <li>
+          Tested COLMAP and MAST3R to get a point cloud from our sparse views. At first our point cloud results from COLMAP
+          were very noisy, so I used filtering techniques such as nearest neighbor and statistical outlier rejection. The
+          result of this step was a dense point cloud which we could use for further mesh reconstruction and texture mapping.
+         </li>
+        <li>
+          Implemented mesh texture mapping from a point cloud by finding each vertice's nearest neighbors in the point cloud and 
+          weighting each points' color by distance.
+        </li>
+        <li>
+          Further filtered point clouds through plane / wall removal using RANSAC for plane prediction in the scene. After predicting
+          the location of the wall / plane in the scene we filter points some distance above and below the plane to remove wall points.
         </li>
       </ol>
 

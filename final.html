@@ -75,17 +75,7 @@
         reconstructions from various views of a person, as well as applying
         custom texture mapping to the resulting geometry. Our goal is to develop
         a pipeline that can generate accurate 3D face models and enable creative
-        applications on these models, such as virtual face tattoos. Our pipeline
-        is broken down into a few key steps. Firstly, from a set of input views,
-        we constructed a sparse point cloud using DUSt3R as well as a mesh
-        constructed from the point cloud, providing us with a starting point for
-        our 3D reconstruction. Next, we used MAST3R to produce a dense point
-        cloud from the same set of input views, creating a dense 3D point cloud.
-        We then used CloudCompare to remove outliers from the mesh and refine
-        the geometry. On our meshes, we applied bump mapping to the surface of
-        the geometry to give the appearance of natural skin texture. Finally, we
-        applied a custom texture mapping to the resulting geometry, allowing us
-        to add tattoos to the face.
+        applications on these models, such as virtual face tattoos. 
       </p>
 
       <h2>Technical Approach</h2>

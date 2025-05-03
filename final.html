@@ -109,14 +109,14 @@
 
         <h3>Poisson Reconstruction</h3>
         <p>
-          Poisson Reconstruction is a method for creating a 3D mesh from a point cloud, where the vertices of the mesh are sampled from the points in the point cloud.
+          Poisson Reconstruction is an algorithm for creating a 3D mesh from a point cloud, where the vertices of the mesh are sampled from the points in the point cloud.
           We attempted to implement Poisson Reconstruction to create a 3D mesh from the dense point cloud produced by MAST3R.
-          However, we were unable to get good results, and thus used CloudCompare's built-in Poisson Reconstruction instead.
+          However, we were unable to get good results, so we decided to use CloudCompare's built-in Poisson Reconstruction instead.
         </p>
 
         <h3>CloudCompare</h3>
         <p>
-          CloudCompare is an open-source tool for creating and editing 3D point clouds. 
+          CloudCompare is an open-source software, similar to Blender or MeshLab,for creating and editing 3D point clouds. 
           We used CloudCompare to remove outliers from the mesh and refine the geometry before applying Poisson Reconstruction with an octree depth of 8.
           In order to feed into CloudCompare's Poisson Reconstruction, I created a script to estimate the normals of each point in our point cloud that was also fed into CloudCompare. 
         </p>
@@ -144,7 +144,7 @@
 
       <h2>References</h2>
       <p>
-        1. DUSt3R 2. MAST3R 3. CloudCompare: https://github.com/cloudcompare/cloudcompare 4. COLMAP 5. FaceScape 6. Open3D 7.
+        1. DUSt3R https://github.com/naver/dust3r 2. MAST3R https://github.com/naver/mast3r 3. CloudCompare: https://github.com/cloudcompare/cloudcompare 4. COLMAP https://colmap.github.io/ 5. FaceScape https://github.com/zhuoyan/FaceScape 6. Open3D https://github.com/isl-org/Open3D 7.
         Perlin Noise: https://rtouti.github.io/graphics/perlin-noise-algorithm 8. Poisson Reconstruction: https://github.com/mkazhdan/PoissonRecon
       </p>
 

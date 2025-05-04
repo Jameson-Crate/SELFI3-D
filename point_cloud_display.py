@@ -11,17 +11,14 @@ def project_image_on_point_cloud(pcd, image_path, center_point=None, size_scale=
     alpha = img_np[:, :, 3]
 
     darkness = 1 - np.mean(rgb, axis=2)
-    
     points = np.asarray(pcd.points)
     
-
     if center_point is None:
         center_point = np.mean(points, axis=0)
     center_point = np.array(center_point)
     print("\nProjection Information:")
     print(f"Center point: [{center_point[0]:.3f}, {center_point[1]:.3f}, {center_point[2]:.3f}]")
     
-
     front_vector = np.array([0, 0, 1])  
     up_vector = np.array([0, 1, 0])     
     right_vector = np.cross(up_vector, front_vector)  
@@ -74,7 +71,6 @@ def project_image_on_point_cloud(pcd, image_path, center_point=None, size_scale=
     colored_pcd = o3d.geometry.PointCloud()
     colored_pcd.points = o3d.utility.Vector3dVector(points)
     colored_pcd.colors = o3d.utility.Vector3dVector(colors)
-    
     return colored_pcd
 
 def visualize_point_cloud(pcd):
@@ -83,17 +79,15 @@ def visualize_point_cloud(pcd):
     
     vis.add_geometry(pcd)
     
-    # Set default camera view
     ctr = vis.get_view_control()
     ctr.set_zoom(0.8)
     ctr.set_front([0, 0, -1])
     ctr.set_lookat([0, 0, 0])
     ctr.set_up([0, -1, 0])
     
-    # Set rendering options
     opt = vis.get_render_option()
-    opt.background_color = np.asarray([0.5, 0.5, 0.5])  # Gray background
-    opt.point_size = 2.0  # Larger point size for better visibility
+    opt.background_color = np.asarray([0.5, 0.5, 0.5])
+    opt.point_size = 2.0
     
     print("Displaying point cloud. Press 'q' to exit.")
     vis.run()
@@ -101,11 +95,7 @@ def visualize_point_cloud(pcd):
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: python point_cloud_display.py <ply_file> <image_file> [x y z] [scale]")
-        print("  ply_file: Path to the PLY point cloud file")
-        print("  image_file: Path to the transparent tattoo image")
-        print("  x y z: Optional center coordinates for projection (default: point cloud center)")
-        print("  scale: Optional scale factor for tattoo size (default: 0.05)")
+        print("Not enough arguments")
         sys.exit(1)
     
     ply_path = sys.argv[1]
@@ -128,20 +118,18 @@ def main():
             print("Error: Scale must be a floating-point number")
             sys.exit(1)
     
-    print(f"Loading point cloud from {ply_path}...")
+    print("Loading point cloud")
     pcd = o3d.io.read_point_cloud(ply_path)
-    print(f"Loaded point cloud with {len(pcd.points)} points")
 
-    print(f"Projecting image {image_path} onto point cloud...")
+    print("Projecting image onto point cloud...")
     colored_pcd = project_image_on_point_cloud(pcd, image_path, center_point, size_scale)
     
     base_name = os.path.splitext(os.path.basename(ply_path))[0]
     output_path = f"{base_name}_tattooed.ply"
     
     o3d.io.write_point_cloud(output_path, colored_pcd)
-    print(f"\nSaved processed point cloud to: {output_path}")
+    print("Saved processed point cloud")
     
-    # Visualize
     print("\nDisplaying result...")
     visualize_point_cloud(colored_pcd)
 

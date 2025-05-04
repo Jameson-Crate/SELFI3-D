@@ -6,37 +6,20 @@ from scipy.spatial import KDTree
 from tqdm import tqdm
 import copy
 
-
-def load_pointcloud(pointcloud_path):
-    pcd = o3d.io.read_point_cloud(str(pointcloud_path))
-    if len(pcd.points) == 0:
-        raise ValueError(f"Failed to load point cloud or file is empty: {pointcloud_path}")
-    if not pcd.has_colors():
-        raise ValueError(f"Point cloud has no color information: {pointcloud_path}") 
-    return pcd
-
-
-def load_mesh(mesh_path):
-    mesh = o3d.io.read_triangle_mesh(str(mesh_path))
-    
-    if len(mesh.vertices) == 0:
-        raise ValueError(f"Failed to load mesh or file is empty: {mesh_path}")
-    return mesh
-
 def inverse_texture_mapping(pcd, mesh, max_distance=None, num_neighbors=3):
     mesh_vertices = np.asarray(mesh.vertices)
     cloud_points = np.asarray(pcd.points)
     cloud_colors = np.asarray(pcd.colors)
     
     pcd_tree = KDTree(cloud_points)
-    
     vertex_colors = np.zeros((len(mesh_vertices), 3))
     
     if max_distance is None:
         mesh_bbox = mesh.get_axis_aligned_bounding_box()
         mesh_extent = np.linalg.norm(mesh_bbox.get_max_bound() - mesh_bbox.get_min_bound())
         max_distance = mesh_extent * 0.05
-        
+    
+    
     for i, vertex in tqdm(enumerate(mesh_vertices), total=len(mesh_vertices), desc="Processing vertices"):
         distances, indices = pcd_tree.query(vertex, k=num_neighbors)
         
@@ -62,6 +45,7 @@ def inverse_texture_mapping(pcd, mesh, max_distance=None, num_neighbors=3):
         colored_mesh.vertex_normals = mesh.vertex_normals
     if mesh.has_triangle_normals():
         colored_mesh.triangle_normals = mesh.triangle_normals
+    
     return colored_mesh
 
 
@@ -71,9 +55,8 @@ def transform_coordinates_for_format(mesh, target_format):
         return mesh
     
     transformed_mesh = copy.deepcopy(mesh)
-    
     vertices = np.asarray(transformed_mesh.vertices).copy()
-
+    
     y_temp = vertices[:, 1].copy()
     vertices[:, 1] = vertices[:, 2]
     vertices[:, 2] = -y_temp
@@ -101,7 +84,7 @@ def main():
     parser = argparse.ArgumentParser(description='Map texture from a point cloud to a mesh')
     parser.add_argument('pointcloud')
     parser.add_argument('mesh')
-    parser.add_argument('--output', '-o', help='Path to save the textured mesh')
+    parser.add_argument('--output', '-o')
     parser.add_argument('--max_distance', type=float, default=None)
     parser.add_argument('--neighbors', type=int, default=3)
     parser.add_argument('--upsample', type=float, default=0)
@@ -110,14 +93,24 @@ def main():
     args = parser.parse_args()
     
     try:
-        pcd = load_pointcloud(args.pointcloud)
-        mesh = load_mesh(args.mesh)
+        pcd = o3d.io.read_point_cloud(str(args.pointcloud))
+    
+        if len(pcd.points) == 0:
+            raise ValueError(f"Failed to load point cloud")
+        
+        if not pcd.has_colors():
+            raise ValueError(f"Point cloud has no color information")
+        
+        mesh = o3d.io.read_triangle_mesh(str(args.mesh))
+        
+        if len(mesh.vertices) == 0:
+            raise ValueError(f"Failed to load mesh")
         
         if args.upsample > 0:
             target_vertices = int(len(pcd.points) * args.upsample)
             current_vertices = len(mesh.vertices)
             
-            if target_vertices > current_vertices:
+            if target_vertices > current_vertices:                
                 iterations = 0
                 estimated_vertices = current_vertices
                 while estimated_vertices < target_vertices:
@@ -130,7 +123,7 @@ def main():
                 
                 if iterations > 0:
                     mesh = mesh.subdivide_midpoint(number_of_iterations=iterations)
-
+        
         colored_mesh = inverse_texture_mapping(pcd, mesh, args.max_distance, args.neighbors)
         
         if args.output:
@@ -142,19 +135,22 @@ def main():
         file_ext = Path(output_path).suffix.lower()
         mesh_to_save = colored_mesh
         
-        if file_ext == '.stl':
-            save_anyway = input("Do you want to save as STL anyway? (y/n): ")
-            if save_anyway.lower() != 'y':
-                alt_format = '.ply'
-                output_path = str(Path(output_path).with_suffix(alt_format))
-                file_ext = alt_format
-        
         if file_ext.lower() in ['.obj', '.glb', '.gltf'] and args.fix_rotation:
             mesh_to_save = transform_coordinates_for_format(colored_mesh, file_ext)
         
+        print(f"Saving textured mesh to {output_path}")
         success = o3d.io.write_triangle_mesh(output_path, mesh_to_save)
+        
+        if not success:
+            if file_ext != '.ply':
+                fallback_path = str(Path(output_path).with_suffix('.ply'))
+                o3d.io.write_triangle_mesh(fallback_path, colored_mesh)
+            return 1
+        
+        return 0
     
     except Exception as e:
+        print(f"Error: {e}")
         return 1
 
 
